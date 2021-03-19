@@ -1,0 +1,30 @@
+{
+  "name": "wwebdev-api",
+  "version": "1.0.0",
+  "description": "a lambda for fetching the weekly updates from mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "lambda-local -l index.js -e event.json",
+    "migrate": "lambda-local -l migrate.js -e event.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wwebdev/wwebdev-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wwebdev/wwebdev-api/issues"
+  },
+  "homepage": "https://github.com/wwebdev/wwebdev-api#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "envalid": "^7.0.0",
+    "lodash": "^4.17.21",
+    "mongodb": "^3.6.4",
+    "mongoose": "^5.11.19"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^14.2.1"
+  }
+}
