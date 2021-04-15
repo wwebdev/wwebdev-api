@@ -20,11 +20,10 @@ exports.handler = (event, context, callback) => {
 };
 
 function processEvent(event, context, callback) {
-  const query = event.queryStringParameters.q || ''
+  const query = event.queryStringParameters.q
   const jsonString = decodeURI(query)
-  const jsonContents = JSON.parse(jsonString) || { weekly: '1' }
-  const filteredQuery = _.pick(jsonContents, ['weekly', 'search'])
-  console.log(filteredQuery)
+  const jsonContents = jsonString ? JSON.parse(jsonString) : { }
+  const filteredQuery = _.pick(jsonContents, ['weekly', 'search', 'page'])
 
   // the following line is critical for performance reasons to
   // allow re-use of database connections across calls to this Lambda
@@ -55,7 +54,7 @@ function processEvent(event, context, callback) {
 
 function getDocsById (db, json, callback) {
   const collection = db.collection("weekly")
-  collection.find({ weekly: json.weekly }, async (err, result) => {
+  collection.find(json, async (err, result) => {
     if (!!err) {
       console.error("an error occurred in getDocs", err);
       sendCallback(callback, err)
@@ -69,9 +68,10 @@ function getDocsById (db, json, callback) {
 
 function searchDocs (db, json, callback) {
   const collection = db.collection("weekly")
-  // https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/#std-label-fts-tutorial-ref
-  collection.aggregate([
-    {
+  const page = json.page ? parseInt(json.page) : 1
+
+  const query = [
+    json.search && {
       $search: {
         "text": {
           "query": json.search,
@@ -80,9 +80,14 @@ function searchDocs (db, json, callback) {
       }
     },
     {
-      $limit: 20
+      $limit: page * 20
     },
-  ], async (err, result) => {
+    {
+      $skip: (page - 1) * 20
+    }
+  ].filter(Boolean)
+  // https://docs.atlas.mongodb.com/reference/atlas-search/tutorial/#std-label-fts-tutorial-ref
+  collection.aggregate(query, async (err, result) => {
     if (!!err) {
       console.error("an error occurred in getDocs", err);
       sendCallback(callback, err)
@@ -98,6 +103,10 @@ function sendCallback(callback, data) {
   callback(null, {
     statusCode: 200,
     body: JSON.stringify(data),
-    headers: {'Content-Type': 'application/json'}
+    headers: {
+      'Content-Type': 'application/json',
+      // TODO allow localhost and wweb.dev or have multiple stages
+      'Access-Control-Allow-Origin': '*'
+    }
   });
 }

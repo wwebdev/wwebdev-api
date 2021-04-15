@@ -20,12 +20,12 @@ exports.handler = (event, context, callback) => {
   }
 };
 
-const weeklyId = '66'
+const weeklyId = '70'
 
 function processEvent(event, context, callback) {
   console.log('Calling MongoDB Atlas from AWS Lambda with event: ' + JSON.stringify(event));
 
-  const data = fs.readFileSync(`./data/${weeklyId}.json`, 'utf8');
+  const data = fs.readFileSync(`./${weeklyId}.json`, 'utf8');
 
   // parse JSON string to JSON object
   const weekly = JSON.parse(data);
@@ -39,7 +39,7 @@ function processEvent(event, context, callback) {
 
   try {
     if (cachedDb == null) {
-      console.log('=> connecting to database2');
+      console.log('=> connecting to database');
       MongoClient.connect(atlas_connection_uri, async (err, client) => {
         cachedDb = client.db('weekly');
         const promises = []
