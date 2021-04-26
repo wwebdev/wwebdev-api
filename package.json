@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "lambda-local -l index.js -e event.json",
-    "migrate": "lambda-local -l migrate.js -e event.json"
+    "migrate": "lambda-local -l migrate.js -e event.json",
+    "migrateImages": "lambda-local -l migrateImages.js -e event.json"
   },
   "repository": {
     "type": "git",
